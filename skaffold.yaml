@@ -1,0 +1,30 @@
+apiVersion: skaffold/v2beta5
+kind: Config
+metadata:
+  name: ticketing
+build:
+  local:
+    push: false
+  artifacts:
+    - image: devdafe/auth
+      context: auth
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+
+    - image: devdafe/client
+      context: client
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: '**/*.js'
+            dest: .
+
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/*

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-depl
+spec:
+  replicas: 1
+  # How to find all the pods to create
+  selector:
+    matchLabels:
+      app: auth
+  # How to create each individual pods
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: auth
+          image: devdafe/auth
+          env:
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwtsecret
+                  key: JWT_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-srv
+  # Tell the service how to behave
+spec:
+  selector:
+    app: auth
+  ports:
+    - name: auth
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

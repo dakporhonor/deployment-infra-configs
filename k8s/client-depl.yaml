@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+        - name: client
+          image: devdafe/client
+      # Fix issues with minikube not having ingress-nginx namespace
+      hostAliases:
+        - ip: '172.17.0.2'
+          hostnames:
+            - 'ticketing.dev'
+---
+# ClusterIP service
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-srv
+# Select pod to manage
+spec:
+  selector:
+    app: client
+  # Ports to allow access to
+  ports:
+    - name: client
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
